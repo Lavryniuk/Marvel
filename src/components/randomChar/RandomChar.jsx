@@ -9,32 +9,39 @@ class RandomChar extends Component{
         this.updateChar();
     }
     state = {
-        name: null,
-        description: null,
-        thumbnail: null,
-        homepage: null,
-        wiki: null
+        char: {}
     }
 
     MarvelService = new MarvelService();
 
+    onCharLoaded = (char) => {
+        this.setState({char})
+    }
+
     updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         this.MarvelService
-        .getCharacter(id)
-        .then(res => {
-            this.setState({
-                name: res.data.results[0].name,
-                description: res.data.results[0].description,
-                thumbnail: res.data.results[0].thumbnail.path + '.' + res.data.results[0].thumbnail.extension,
-                homepage: res.data.results[0].urls[0].url,
-                wiki: res.data.results[0].urls[1].url
-            })
-        })
+            .getCharacter(id)
+            .then(this.onCharLoaded)
+    }
+
+    replaceDescription = (descr) => {
+        if (!descr) {
+            const noDescr = `No description available.`;
+            return noDescr;
+        }
+        
+        if (descr.length > 120) {
+            const words = descr.substring(0, 120).split(' ');
+            words.pop();
+            return words.join(' ') + '...';
+        }
+
+        return descr;
     }
 
     render() {
-        const {name, description, thumbnail, homepage, wiki} = this.state;
+        const {char: {name, description, thumbnail, homepage, wiki}} = this.state;
         return (
             <div className="randomchar">
                 <div className="randomchar__block">
@@ -42,7 +49,7 @@ class RandomChar extends Component{
                     <div className="randomchar__info">
                         <p className="randomchar__name">{name}</p>
                         <p className="randomchar__descr">
-                            {description}
+                            {this.replaceDescription(description)}
                         </p>
                         <div className="randomchar__btns">
                             <a href={homepage} className="button button__main">
