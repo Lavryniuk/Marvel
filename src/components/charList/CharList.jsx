@@ -12,7 +12,7 @@ class CharList extends  Component{
         error: false,
         newItemLoading: false,
         offset: 210,
-        charEnded: false
+        charEnded: false,
     }
 
     MarvelService = new MarvelService();
@@ -62,10 +62,30 @@ class CharList extends  Component{
         })
     }
 
+    itemRefs = [];
+
+    setRef = (el, i) => {
+        this.itemRefs[i] = el;
+    }
+
+    focusOnItem = (i) => {
+        this.itemRefs.forEach(item => {
+            if (item) {
+                item.classList.remove('char__item_selected');
+            }
+        });
     
+        const selectedItem = this.itemRefs[i];
+        if (selectedItem) {
+            selectedItem.classList.add('char__item_selected');
+            selectedItem.focus();
+        }
+    }
 
     renderItems(arr) {
-        const items =  arr.map((item) => {
+        this.itemRefs = [];
+        
+        const items =  arr.map((item, i) => {
             let imgStyle = {'objectFit' : 'cover'};
             if (item.thumbnail.includes('image_not_available.jpg')) {
                 imgStyle = {'objectFit' : 'unset'};
@@ -75,7 +95,18 @@ class CharList extends  Component{
                 <li 
                     className="char__item"
                     key={item.id}
-                    onClick={() => this.props.onCharSelected(item.id)}>
+                    tabIndex={0}
+                    ref={el => this.setRef(el, i)}
+                    onClick={() => {
+                        this.props.onCharSelected(item.id);
+                        this.focusOnItem(i);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === "Enter") {
+                            this.props.onCharSelected(item.id);
+                            this.focusOnItem(i);
+                        }
+                    }}>
                         <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
                         <div className="char__name">{item.name}</div>
                 </li>
@@ -113,7 +144,7 @@ class CharList extends  Component{
 }
 
 CharList.propTypes = {
-    onCharSelected: PropTypes.number
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
