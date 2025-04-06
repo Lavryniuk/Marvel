@@ -72,7 +72,7 @@ class CharInfo extends Component{
 
     replaceComics = (comics) => {
         if (comics.length === 0) {
-            return 'There are no comics for this character';
+            return 'There are no comics available for this character';
         }
 
         return comics.slice(0, 10).map((item, i) => {
@@ -90,7 +90,15 @@ class CharInfo extends Component{
         const skeleton =char || loading || error ? null : <Skeleton/>;
         const errorMessage = error ? <ErrorMessage/> : null;
         const spinner = loading ? <Spinner/> : null;
-        const content = !(loading || error || !char) ? <View char={char} replaceDescription={this.replaceDescription} replaceComics={this.replaceComics}/> : null;
+
+        const content = 
+            !(loading || error || !char) ? (
+                <View 
+                    char={char} 
+                    replaceDescription={this.replaceDescription} 
+                    replaceComics={this.replaceComics}
+                />) 
+            : null;
 
         return (
             <div className="char__info">
