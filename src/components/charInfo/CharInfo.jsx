@@ -1,6 +1,6 @@
 import './charInfo.scss';
 import { useState, useEffect } from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
@@ -8,10 +8,8 @@ import Skeleton from '../skeleton/Skeleton';
 const CharInfo = (props) => {
    
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
         
-    const marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -22,38 +20,14 @@ const CharInfo = (props) => {
         if (!charId) {
             return;
         }
-
-        setLoading(loading => true);
-        setError(false);
-
-        marvelService
-            .getCharacter(charId)
+        
+        clearError();
+        getCharacter(charId)
             .then(onCharLoaded)
-            .catch(onError);
     }
 
     const onCharLoaded = (char) => {
-        setLoading(loading => false);
         setChar(char);
-    }
-
-    const onError = () => {
-        setLoading(loading => false);
-        setError(error => true);
-    }
-
-    const replaceComics = (comics) => {
-        if (comics.length === 0) {
-            return 'There are no comics available for this character';
-        }
-
-        return comics.slice(0, 10).map((item, i) => {
-            return (
-                <li key={i} className="char__comics-item">
-                    {item.name}
-                </li>
-            )
-        })
     }
 
     const skeleton =char || loading || error ? null : <Skeleton/>;
@@ -77,6 +51,20 @@ const CharInfo = (props) => {
             {content}
         </div>
     )
+}
+
+const replaceComics = (comics) => {
+    if (comics.length === 0) {
+        return 'There are no comics available for this character';
+    }
+
+    return comics.slice(0, 10).map((item, i) => {
+        return (
+            <li key={i} className="char__comics-item">
+                {item.name}
+            </li>
+        )
+    })
 }
 
 const replaceDescription = (descr) => {
