@@ -25,6 +25,9 @@
                 a:hover {
                     color: $main-color;
                 }
+                a.active {
+                    color: #9f0013;
+                }
             }
         }
     }
