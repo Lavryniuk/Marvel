@@ -11,7 +11,7 @@ const AppHeader = () => {
             </h1>
             <nav className="app__menu">
                 <ul>
-                    <li><NavLink to='/'>Characters</NavLink></li>
+                    <li><NavLink end to='/'>Characters</NavLink></li>
                     /
                     <li><NavLink to='/comics'>Comics</NavLink></li>
                 </ul>
