@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import { motion } from 'framer-motion';
+import AnimatedList from '../animated/AnimatedList';
 
 const ComicsList = () => {
     const [comicsList, setComicsList] = useState([]);
@@ -41,24 +43,24 @@ const ComicsList = () => {
     }
 
     function renderItems(arr) {
-        
-        const items =  arr.map((item, i) => {
-            return (
-                <li className="comics__item" key={i}>
-                    <Link to={`/comics/${item.id}`}>
-                        <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
-                        <div className="comics__item-name">{item.title}</div>
-                        <div className="comics__item-price">{item.price}</div>
-                    </Link>
-                </li>
-            )
-        });
-
         return (
-            <ul className="comics__grid">
-                {items}
-            </ul>
-        )
+            <AnimatedList
+                items={arr}
+                itemsClassname='comics__item'
+                gridClassname='comics__grid'
+                renderItem={(item, i) => {
+                    return (
+                        <>
+                            <Link to={`/comics/${item.id}`}>
+                                <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
+                                <div className="comics__item-name">{item.title}</div>
+                                <div className="comics__item-price">{item.price}</div>
+                            </Link>
+                        </>
+                    );
+                }}
+            />
+        );
     }
 
     const items = renderItems(comicsList);
@@ -66,17 +68,24 @@ const ComicsList = () => {
     const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     return (
-        <div className="comics__list">
-            {errorMessage}
-            {spinner}
-            {items}
-            <button className="button button__main button__long"
-                    disabled={newItemLoading}
-                    style={{'display': comicsEnded ? 'none' : 'block'}}
-                    onClick={() => onRequest(offset)}>
-                <div className="inner">load more</div>
-            </button>
-        </div>
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.4 }}
+        >
+            <div className="comics__list">
+                {errorMessage}
+                {spinner}
+                {items}
+                <button className="button button__main button__long"
+                        disabled={newItemLoading}
+                        style={{'display': comicsEnded ? 'none' : 'block'}}
+                        onClick={() => onRequest(offset)}>
+                    <div className="inner">load more</div>
+                </button>
+            </div>
+        </motion.div>
     )
 }
 

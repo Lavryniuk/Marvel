@@ -4,6 +4,8 @@ import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import PropTypes from 'prop-types';
+import { motion } from 'framer-motion';
+import AnimatedList from '../animated/AnimatedList';
 
 const CharList = (props) => {
 
@@ -58,40 +60,39 @@ const CharList = (props) => {
     }
 
     function renderItems(arr) {
-        
-        const items =  arr.map((item, i) => {
-            let imgStyle = {'objectFit' : 'cover'};
-            if (item.thumbnail.includes('image_not_available.jpg')) {
-                imgStyle = {'objectFit' : 'unset'};
-            }
-
-            return (
-                <li 
-                    className="char__item"
-                    key={item.id}
-                    tabIndex={0}
-                    ref={el => itemRefs.current[i] = el}
-                    onClick={() => {
+        return (
+            <AnimatedList
+                items={arr}
+                itemsClassname='char__item'
+                gridClassname='char__grid'
+                getItemProps={(item, i) => ({
+                    ref: el => itemRefs.current[i] = el,
+                    tabIndex: 0,
+                    onClick: () => {
                         props.onCharSelected(item.id);
                         focusOnItem(i);
-                    }}
-                    onKeyDown={(e) => {
+                    },
+                    onKeyDown: (e) => {
                         if (e.key === ' ' || e.key === "Enter") {
                             props.onCharSelected(item.id);
                             focusOnItem(i);
                         }
-                    }}>
-                        <img src={item.thumbnail} alt={item.name} style={imgStyle}/>
-                        <div className="char__name">{item.name}</div>
-                </li>
-            )
-        });
-
-        return (
-            <ul className="char__grid">
-                {items}
-            </ul>
-        )
+                    }
+                })}
+                renderItem={(item, i) => {
+                    let imgStyle = item.thumbnail.includes('image_not_available.jpg')
+                        ? { objectFit: 'unset' }
+                        : { objectFit: 'cover' };
+    
+                    return (
+                        <>
+                            <img src={item.thumbnail} alt={item.name} style={imgStyle} />
+                            <div className="char__name">{item.name}</div>
+                        </>
+                    );
+                }}
+            />
+        );
     }
 
     const items = renderItems(charList);
@@ -99,17 +100,24 @@ const CharList = (props) => {
     const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
     return (
-        <div className="char__list">
-            {errorMessage}
-            {spinner}
-            {items}
-            <button className="button button__main button__long"
-                    disabled={newItemLoading}
-                    style={{'display': charEnded ? 'none' : 'block'}}
-                    onClick={() => onRequest(offset)}>
-                <div className="inner">load more</div>
-            </button>
-        </div>
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.4 }}
+        >
+            <div className="char__list">
+                {errorMessage}
+                {spinner}
+                {items}
+                <button className="button button__main button__long"
+                        disabled={newItemLoading}
+                        style={{'display': charEnded ? 'none' : 'block'}}
+                        onClick={() => onRequest(offset)}>
+                    <div className="inner">load more</div>
+                </button>
+            </div>
+        </motion.div>
     )
 }
 
