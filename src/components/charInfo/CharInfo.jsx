@@ -55,21 +55,17 @@ const CharInfo = (props) => {
 }
 
 const replaceComics = (comics) => {
-    if (comics.length === 0) {
-        return 'There are no comics available for this character';
+    if (!comics || comics.length === 0) {
+        return (
+            <li className="char__comics-item">There are no comics available for this character</li>
+        )
     }
 
-    return comics.slice(0, 10).map((item, i) => {
-        const comicId = item.resourceURI?.split('/').pop();
-        
-        return (
-            <li key={i} className="char__comics-item">
-                <Link to={`/comics/${comicId}`}>
-                    {item.name}
-                </Link>
-            </li>
-        )
-    })
+    return comics.slice(0, 10).map((item, i) => (
+        <li key={i} className="char__comics-item">
+            {item}
+        </li>
+    ));
 }
 
 const replaceDescription = (descr) => {
